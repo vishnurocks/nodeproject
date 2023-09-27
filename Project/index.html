@@ -38,15 +38,16 @@
         <option value="workflow">Workflow</option>
     </select>
     <label>From</label>
-    <input type="date" id="fromdate">
+    <input type="datetime-local" id="fromdate" name="datetime" placeholder="YYYY-MM-DD HH:MM">
     <label>To</label>
-    <input type="date" id="todate">
+    <input type="datetime-local" id="todate" name="datetime" placeholder="YYYY-MM-DD HH:MM">
+    
     
     <button type="button" onclick="getTotalCount()">Total Count</button>
-    <button type="button" onclick="getHourlyCount()">Hourly Count</button>
-    <button type="button" onclick="getMinuteCount()">Minute Count</button>
     <h2>Server Response:</h2>
     <div id="tableContainer"></div>
+
+    </div>
 
     <script>
         async function getTotalCount() {
@@ -72,10 +73,10 @@
 
             if (response.ok) {
                 const responseData = await response.json();
-                generateTable(responseData);
+                 generateTable(responseData);
                 console.log('Server response:', responseData);
             } else {
-                console.error('Failed to send data to the server');
+                console.log('Failed to send data to the server');
             }
         }
         function generateTable(data) {
