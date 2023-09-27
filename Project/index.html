@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Add your CSS styles here */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <input id="test1" value="sender">
+    <label>Choose one</label>
+    <select id="filter1">
+        <option value="icn" selected>ICN</option>
+        <option value="sender">Sender</option>
+        <option value="dest">Destination</option>
+        <option value="workflow">Workflow</option>
+    </select>
+    <label>From</label>
+    <input type="date" id="fromdate">
+    <label>To</label>
+    <input type="date" id="todate">
+    
+    <button type="button" onclick="getTotalCount()">Total Count</button>
+    <button type="button" onclick="getHourlyCount()">Hourly Count</button>
+    <button type="button" onclick="getMinuteCount()">Minute Count</button>
+    <h2>Server Response:</h2>
+    <div id="tableContainer"></div>
+
+    <script>
+        async function getTotalCount() {
+            const inputElement = document.getElementById("test1").value;
+            const fromDate = document.getElementById("fromdate").value;
+            const toDate = document.getElementById("todate").value;
+            const filter = document.getElementById("filter1").value;
+
+
+            // Send the data to the server
+            const response = await fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify( {
+                inputElement,
+                filter,
+                fromDate,
+                toDate
+            })
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                generateTable(responseData);
+                console.log('Server response:', responseData);
+            } else {
+                console.error('Failed to send data to the server');
+            }
+        }
+        function generateTable(data) {
+            const table = document.createElement('table');
+            const tableContainer = document.getElementById('tableContainer');
+
+            // Create table header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+
+            for (const key in data[0]) {
+                if (data[0].hasOwnProperty(key)) {
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                }
+            }
+
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create table body
+            const tbody = document.createElement('tbody');
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                for (const key in item) {
+                    if (item.hasOwnProperty(key)) {
+                        const cell = document.createElement('td');
+                        cell.textContent = item[key];
+                        row.appendChild(cell);
+                    }
+                }
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+            tableContainer.appendChild(table);
+        }
+        
+    </script>
+</body>
+</html>
