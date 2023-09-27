@@ -29,18 +29,19 @@
     </style>
 </head>
 <body>
-    <input id="test1" value="sender">
-    <label>Choose one</label>
-    <select id="filter1">
+    
+    <label>Choose type of sender</label>
+    <select id="filter">
         <option value="icn" selected>ICN</option>
         <option value="sender">Sender</option>
         <option value="dest">Destination</option>
         <option value="workflow">Workflow</option>
     </select>
+    <input id="test1" value="sender">
     <label>From</label>
-    <input type="datetime-local" id="fromdate" name="datetime" placeholder="YYYY-MM-DD HH:MM">
+    <input type="datetime-local" id="fromdate" name="datetime" placeholder="YYYY-MM-DD HH:MM:SS">
     <label>To</label>
-    <input type="datetime-local" id="todate" name="datetime" placeholder="YYYY-MM-DD HH:MM">
+    <input type="datetime-local" id="todate" name="datetime" placeholder="YYYY-MM-DD HH:MM:SS">
     
     
     <button type="button" onclick="getTotalCount()">Total Count</button>
@@ -52,10 +53,22 @@
     <script>
         async function getTotalCount() {
             const inputElement = document.getElementById("test1").value;
-            const fromDate = document.getElementById("fromdate").value;
-            const toDate = document.getElementById("todate").value;
-            const filter = document.getElementById("filter1").value;
-
+            const fromDateTime = new Date(document.getElementById("fromdate").value);
+            const fromDate = formatDateTime(fromDateTime);
+            const toDateTime = new Date(document.getElementById("todate").value);
+            const toDate = formatDateTime(toDateTime);
+            const filter = document.getElementById("filter").value;
+            
+            function formatDateTime(dateTime) {
+                    const year = dateTime.getFullYear();
+                    const month = ('0' + (dateTime.getMonth() + 1)).slice(-2);
+                    const day = ('0' + dateTime.getDate()).slice(-2);
+                    const hours = ('0' + dateTime.getHours()).slice(-2);
+                    const minutes = ('0' + dateTime.getMinutes()).slice(-2);
+                    const seconds = ('0' + dateTime.getSeconds()).slice(-2);
+                    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                    return formattedDateTime;
+                }
 
             // Send the data to the server
             const response = await fetch('/submit', {
@@ -79,13 +92,60 @@
                 console.log('Failed to send data to the server');
             }
         }
+
         function generateTable(data) {
+    const table = document.createElement('table');
+    const tableContainer = document.getElementById('tableContainer');
+
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = Object.keys(data[0]);
+
+    // Add an auto-increment header
+    headers.unshift('SNo');
+
+    headers.forEach(key => {
+        const th = document.createElement('th');
+        th.textContent = key;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create table body
+    const tbody = document.createElement('tbody');
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        const rowNumberCell = document.createElement('td');
+        rowNumberCell.textContent = index + 1;  // Auto-incremented value
+        row.appendChild(rowNumberCell);
+
+        for (const key in item) {
+            if (item.hasOwnProperty(key)) {
+                const cell = document.createElement('td');
+                cell.textContent = item[key];
+                row.appendChild(cell);
+            }
+        }
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+}
+
             const table = document.createElement('table');
             const tableContainer = document.getElementById('tableContainer');
 
             // Create table header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
+
+            // Add an auto-increment header
+                headers.unshift('ID');
 
             for (const key in data[0]) {
                 if (data[0].hasOwnProperty(key)) {
@@ -94,29 +154,7 @@
                     headerRow.appendChild(th);
                 }
             }
-
-            thead.appendChild(headerRow);
-            table.appendChild(thead);
-
-            // Create table body
-            const tbody = document.createElement('tbody');
-            data.forEach(item => {
-                const row = document.createElement('tr');
-
-                for (const key in item) {
-                    if (item.hasOwnProperty(key)) {
-                        const cell = document.createElement('td');
-                        cell.textContent = item[key];
-                        row.appendChild(cell);
-                    }
-                }
-
-                tbody.appendChild(row);
-            });
-
-            table.appendChild(tbody);
-            tableContainer.appendChild(table);
-        }
+        
         
     </script>
 </body>
