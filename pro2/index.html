@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         /* Add your CSS styles here */
@@ -8,8 +9,9 @@
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ccc;
             padding: 8px;
             text-align: left;
@@ -28,8 +30,9 @@
         }
     </style>
 </head>
+
 <body>
-    
+
     <label>Choose type of sender</label>
     <select id="filter">
         <option value="icn" selected>ICN</option>
@@ -42,33 +45,43 @@
     <input type="datetime-local" id="fromdate" name="datetime" placeholder="YYYY-MM-DD HH:MM:SS">
     <label>To</label>
     <input type="datetime-local" id="todate" name="datetime" placeholder="YYYY-MM-DD HH:MM:SS">
-    
-    
+
+
     <button type="button" onclick="getTotalCount()">Total Count</button>
+    <button type="button" onclick="getHourCount()">hour Count</button>
+    <button type="button" onclick="getMinuteCount()">minute Count</button>
+
     <h2>Server Response:</h2>
     <div id="tableContainer"></div>
 
     </div>
 
     <script>
+        // const inputElement = document.getElementById("test1").value;
+        //     const fromDateTime = new Date(document.getElementById("fromdate").value);
+        //     const fromDate1 = formatDateTime(fromDateTime);
+        //     const toDateTime = new Date(document.getElementById("todate").value);
+        //     const toDate1 = formatDateTime(toDateTime);
+        //     const filter = document.getElementById("filter").value;
+
+        function formatDateTime(dateTime) {
+            const year = dateTime.getFullYear();
+            const month = ('0' + (dateTime.getMonth() + 1)).slice(-2);
+            const day = ('0' + dateTime.getDate()).slice(-2);
+            const hours = ('0' + dateTime.getHours()).slice(-2);
+            const minutes = ('0' + dateTime.getMinutes()).slice(-2);
+            const seconds = ('0' + dateTime.getSeconds()).slice(-2);
+            const formattedDateTime = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+            return formattedDateTime;
+        }
+
         async function getTotalCount() {
             const inputElement = document.getElementById("test1").value;
             const fromDateTime = new Date(document.getElementById("fromdate").value);
-            const fromDate = formatDateTime(fromDateTime);
+            const fromDate1 = formatDateTime(fromDateTime);
             const toDateTime = new Date(document.getElementById("todate").value);
-            const toDate = formatDateTime(toDateTime);
+            const toDate1 = formatDateTime(toDateTime);
             const filter = document.getElementById("filter").value;
-            
-            function formatDateTime(dateTime) {
-                    const year = dateTime.getFullYear();
-                    const month = ('0' + (dateTime.getMonth() + 1)).slice(-2);
-                    const day = ('0' + dateTime.getDate()).slice(-2);
-                    const hours = ('0' + dateTime.getHours()).slice(-2);
-                    const minutes = ('0' + dateTime.getMinutes()).slice(-2);
-                    const seconds = ('0' + dateTime.getSeconds()).slice(-2);
-                    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-                    return formattedDateTime;
-                }
 
             // Send the data to the server
             const response = await fetch('/submit', {
@@ -76,86 +89,148 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify( {
-                inputElement,
-                filter,
-                fromDate,
-                toDate
-            })
+                body: JSON.stringify({
+                    inputElement,
+                    filter,
+                    fromDate1,
+                    toDate1
+                })
             });
 
             if (response.ok) {
                 const responseData = await response.json();
-                 generateTable(responseData);
+                generateTable(responseData);
                 console.log('Server response:', responseData);
             } else {
                 console.log('Failed to send data to the server');
             }
         }
 
-        function generateTable(data) {
-    const table = document.createElement('table');
-    const tableContainer = document.getElementById('tableContainer');
+        async function getHourCount() {
 
-    // Create table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    const headers = Object.keys(data[0]);
+            // Send the data to the server
+            const inputElement = document.getElementById("test1").value;
+            const fromDateTime = new Date(document.getElementById("fromdate").value);
+            const fromDate1 = formatDateTime(fromDateTime);
+            const toDateTime = new Date(document.getElementById("todate").value);
+            const toDate1 = formatDateTime(toDateTime);
+            const filter = document.getElementById("filter").value;
 
-    // Add an auto-increment header
-    headers.unshift('SNo');
+            const response = await fetch('/hour', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    inputElement,
+                    filter,
+                    fromDate1,
+                    toDate1
+                })
+            });
 
-    headers.forEach(key => {
-        const th = document.createElement('th');
-        th.textContent = key;
-        headerRow.appendChild(th);
-    });
-
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Create table body
-    const tbody = document.createElement('tbody');
-    data.forEach((item, index) => {
-        const row = document.createElement('tr');
-        const rowNumberCell = document.createElement('td');
-        rowNumberCell.textContent = index + 1;  // Auto-incremented value
-        row.appendChild(rowNumberCell);
-
-        for (const key in item) {
-            if (item.hasOwnProperty(key)) {
-                const cell = document.createElement('td');
-                cell.textContent = item[key];
-                row.appendChild(cell);
+            if (response.ok) {
+                const responseData = await response.json();
+                generateTable(responseData);
+                console.log('Server response:', responseData);
+            } else {
+                console.log('Failed to send data to the server');
             }
         }
+        async function getMinuteCount() {
 
-        tbody.appendChild(row);
-    });
+            // Send the data to the server
+            const inputElement = document.getElementById("test1").value;
+            const fromDateTime = new Date(document.getElementById("fromdate").value);
+            const fromDate1 = formatDateTime(fromDateTime);
+            const toDateTime = new Date(document.getElementById("todate").value);
+            const toDate1 = formatDateTime(toDateTime);
+            const filter = document.getElementById("filter").value;
+            const response = await fetch('/min', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    inputElement,
+                    filter,
+                    fromDate1,
+                    toDate1
+                })
+            });
 
-    table.appendChild(tbody);
-    tableContainer.appendChild(table);
-}
-
+            if (response.ok) {
+                const responseData = await response.json();
+                generateTable(responseData);
+                console.log('Server response:', responseData);
+            } else {
+                console.log('Failed to send data to the server');
+            }
+        }
+        function generateTable(data) {
             const table = document.createElement('table');
             const tableContainer = document.getElementById('tableContainer');
 
             // Create table header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
+            const headers = Object.keys(data[0]);
 
             // Add an auto-increment header
-                headers.unshift('ID');
+            headers.unshift('SNo');
 
-            for (const key in data[0]) {
-                if (data[0].hasOwnProperty(key)) {
-                    const th = document.createElement('th');
-                    th.textContent = key;
-                    headerRow.appendChild(th);
+            headers.forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
+            });
+
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create table body
+            const tbody = document.createElement('tbody');
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const rowNumberCell = document.createElement('td');
+                rowNumberCell.textContent = index + 1;  // Auto-incremented value
+                row.appendChild(rowNumberCell);
+
+                for (const key in item) {
+                    if (item.hasOwnProperty(key)) {
+                        const cell = document.createElement('td');
+                        cell.textContent = item[key];
+                        row.appendChild(cell);
+                    }
                 }
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+            tableContainer.appendChild(table);
+        }
+
+        const table = document.createElement('table');
+        const tableContainer = document.getElementById('tableContainer');
+
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+
+        // Add an auto-increment header
+        headers.unshift('ID');
+
+        for (const key in data[0]) {
+            if (data[0].hasOwnProperty(key)) {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
             }
-        
-        
+        }
+
+
     </script>
 </body>
+
 </html>
